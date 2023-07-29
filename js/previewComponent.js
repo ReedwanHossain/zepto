@@ -64,17 +64,25 @@ function changeColor(color) {
 }
 
 function downloadPreview() {
-  window.scrollTo(0, 0);
-  const previewElement = document.getElementById("content-container");
-  const options = {
-    scale: 2,
-    useCORS: true,
-  };
+  const divToConvert = document.getElementById("content-container");
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
-  html2canvas(previewElement, options).then((canvas) => {
-    const link = document.createElement("a");
-    link.download = "preview_image.png";
-    link.href = canvas.toDataURL();
-    link.click();
-  });
+  canvas.width = divToConvert.clientWidth;
+  canvas.height = divToConvert.clientHeight;
+
+  const bgColor = window.getComputedStyle(divToConvert).backgroundColor;
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const svgString = new XMLSerializer().serializeToString(divToConvert);
+  const svgData =
+    "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgString);
+
+  const downloadLink = document.createElement("a");
+  downloadLink.href = svgData;
+  const img = new Image();
+  img.src = svgData;
+  downloadLink.download = "preview_image.svg";
+  downloadLink.click();
 }
